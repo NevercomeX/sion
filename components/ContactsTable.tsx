@@ -28,10 +28,10 @@ export default function ContactsTable({
   });
 
   return (
-    <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-5">
+    <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-5">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3 flex-1 min-w-[280px]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 flex-1">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
             <input
@@ -48,7 +48,7 @@ export default function ContactsTable({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
+              className="w-full sm:w-auto px-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
             >
               <option value="">Todos los estados</option>
               <option value="pendiente">Pendiente</option>
@@ -57,29 +57,29 @@ export default function ContactsTable({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-sm:w-full">
           <button
             onClick={() => exportSurveysToExcel(filteredRecords)}
-            className="inline-flex items-center gap-1.5 bg-[#176b55] hover:bg-[#0f513f] text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all shadow-xs"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 bg-[#176b55] hover:bg-[#0f513f] text-white font-semibold text-xs px-3.5 py-2.5 rounded-xl transition-all shadow-xs"
           >
             <FileSpreadsheet className="w-4 h-4" />
-            <span>Exportar Excel (.xlsx)</span>
+            <span>Excel</span>
           </button>
 
           <button
             onClick={onExportCsv}
-            className="inline-flex items-center gap-1.5 bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold text-xs px-4 py-2.5 rounded-xl transition-colors"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold text-xs px-3.5 py-2.5 rounded-xl transition-colors"
           >
             <Download className="w-4 h-4" />
-            <span>Exportar CSV</span>
+            <span>CSV</span>
           </button>
         </div>
       </div>
 
       {/* Table */}
       {filteredRecords.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-left text-xs min-w-[650px] sm:min-w-full">
             <thead>
               <tr className="bg-[#f5f8f7] text-[#6b7a76] border-b border-[#dce6e2]">
                 <th className="p-3 font-bold">Fecha</th>

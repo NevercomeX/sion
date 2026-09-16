@@ -30,6 +30,7 @@ export default function Home() {
   const [records, setRecords] = useState<SurveyRecord[]>([]);
   const [collectors, setCollectors] = useState<string[]>([]);
   const [isSupabaseActive, setIsSupabaseActive] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const [editingRecord, setEditingRecord] = useState<SurveyRecord | null>(null);
   const [detailModalId, setDetailModalId] = useState<string | null>(null);
@@ -193,25 +194,28 @@ export default function Home() {
   const selectedRecord = records.find((r) => r.id === detailModalId) || null;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-[#f5f7f8]">
       {/* Sidebar */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onNewSurvey={handleNewSurveyTrigger}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
-      <div className="ml-[245px] w-[calc(100%-245px)] max-md:ml-[70px] max-md:w-[calc(100%-70px)] flex flex-col min-h-screen transition-all duration-300">
+      <div className="md:ml-[250px] w-full md:w-[calc(100%-250px)] flex flex-col min-h-screen transition-all duration-300 pb-16 md:pb-0">
         <Header
           title={titleMap[activeTab] || "Roca de Sión"}
           isSupabaseActive={isSupabaseActive}
           userName="Administrador"
           onNewSurvey={handleNewSurveyTrigger}
           onAdminLogout={handleAdminLogout}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
-        <main className="p-6 max-w-[1400px] w-full mx-auto flex-1">
+        <main className="p-4 sm:p-6 max-w-[1400px] w-full mx-auto flex-1">
           {activeTab === "home" && (
             <HomeDashboard
               records={records}

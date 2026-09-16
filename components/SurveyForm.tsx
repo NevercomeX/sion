@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { SurveyRecord, FactorAnswers, ContactPreference, NextActionOption } from "../lib/types";
 import { TOPICS, FACTORS, getRiskInfo, todayString } from "../lib/survey-utils";
-import { Save, RefreshCw, ShieldAlert, HeartPulse, CheckSquare } from "lucide-react";
+import { Save, RefreshCw, ShieldAlert, HeartPulse } from "lucide-react";
 
 interface SurveyFormProps {
   currentCollector: string;
@@ -154,17 +154,17 @@ export default function SurveyForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
       {/* Basic Data Card */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-[#18302a]">
+          <h2 className="text-base sm:text-lg font-bold text-[#18302a]">
             {editingRecord ? "Editar encuesta" : "Nueva encuesta"}
           </h2>
           <p className="text-xs text-[#6b7a76]">Registre la información con autorización de la persona.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-sm:grid-cols-1">
           <div>
             <label className="block text-xs font-bold text-[#18302a] mb-1">Nombre completo *</label>
             <input
@@ -173,7 +173,7 @@ export default function SurveyForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej.: María López"
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] focus:ring-2 focus:ring-[#176b55]/20 font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] focus:ring-2 focus:ring-[#176b55]/20 font-medium"
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function SurveyForm({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Ej.: +56 9 1234 5678"
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] focus:ring-2 focus:ring-[#176b55]/20 font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] focus:ring-2 focus:ring-[#176b55]/20 font-medium"
             />
           </div>
 
@@ -195,7 +195,7 @@ export default function SurveyForm({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Ej.: Av. Central 123, Sector Norte"
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] focus:ring-2 focus:ring-[#176b55]/20 font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             />
           </div>
 
@@ -205,7 +205,7 @@ export default function SurveyForm({
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             />
           </div>
 
@@ -216,7 +216,7 @@ export default function SurveyForm({
               value={collector}
               onChange={(e) => setCollector(e.target.value)}
               placeholder="Nombre del encuestador"
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             />
           </div>
 
@@ -225,7 +225,7 @@ export default function SurveyForm({
             <select
               value={contactPref}
               onChange={(e) => setContactPref(e.target.value as ContactPreference)}
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             >
               <option value="WhatsApp">WhatsApp</option>
               <option value="Llamada">Llamada</option>
@@ -237,19 +237,19 @@ export default function SurveyForm({
       </div>
 
       {/* Topics of Interest */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-[#18302a]">Temas de interés</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#18302a]">Temas de interés</h2>
           <p className="text-xs text-[#6b7a76]">Puede seleccionar varias opciones.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 max-sm:grid-cols-1">
           {TOPICS.map((topic) => {
             const isChecked = selectedTopics.includes(topic);
             return (
               <label
                 key={topic}
-                className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer text-sm font-semibold transition-all ${
+                className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer text-xs sm:text-sm font-semibold transition-all ${
                   isChecked
                     ? "border-[#176b55] bg-[#edf7f3] text-[#0f513f]"
                     : "border-[#dce6e2] hover:bg-[#f5f8f7] text-[#18302a]"
@@ -259,9 +259,9 @@ export default function SurveyForm({
                   type="checkbox"
                   checked={isChecked}
                   onChange={() => handleTopicToggle(topic)}
-                  className="w-4 h-4 rounded text-[#176b55] focus:ring-[#176b55]"
+                  className="w-4 h-4 rounded text-[#176b55] focus:ring-[#176b55] shrink-0"
                 />
-                <span>{topic}</span>
+                <span className="leading-snug">{topic}</span>
               </label>
             );
           })}
@@ -269,14 +269,14 @@ export default function SurveyForm({
       </div>
 
       {/* Cardiac Health Factors */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
         <div>
           <div className="flex items-center gap-2">
             <HeartPulse className="w-5 h-5 text-[#176b55]" />
-            <h2 className="text-lg font-bold text-[#18302a]">Pronóstico cardíaco</h2>
+            <h2 className="text-base sm:text-lg font-bold text-[#18302a]">Pronóstico cardíaco</h2>
           </div>
-          <p className="text-xs text-[#6b7a76] mt-1">
-            Seleccione una opción por factor. En “Enfermedad / otros factores” puede seleccionar varios. Es un cuestionario orientativo y no un diagnóstico profesional.
+          <p className="text-xs text-[#6b7a76] mt-1 leading-relaxed">
+            Seleccione una opción por factor. En “Enfermedad / otros factores” puede seleccionar varios. Cuestionario orientativo, no diagnóstico médico.
           </p>
         </div>
 
@@ -286,23 +286,23 @@ export default function SurveyForm({
 
             return (
               <div key={factor.key} className="border border-[#dce6e2] rounded-xl overflow-hidden">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#18302a] bg-[#f7faf9] px-4 py-2.5 border-b border-[#dce6e2]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#18302a] bg-[#f7faf9] px-3.5 py-2 border-b border-[#dce6e2]">
                   {factor.name}
                 </h3>
-                <div className="p-3 space-y-1.5">
+                <div className="p-2.5 space-y-1.5">
                   {factor.opts.map(([label, points]) => {
                     const isChecked = currentAnswers.some((x) => x.label === label);
 
                     return (
                       <label
                         key={label}
-                        className={`flex items-center justify-between p-2.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
+                        className={`flex items-start sm:items-center justify-between gap-2 p-2.5 rounded-lg border text-xs font-medium cursor-pointer transition-colors ${
                           isChecked
                             ? "bg-[#edf7f3] border-[#176b55] text-[#0f513f] font-semibold"
                             : "border-transparent hover:bg-[#edf7f3]/50 text-[#18302a]"
                         }`}
                       >
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-start gap-2.5 flex-1 min-w-0">
                           <input
                             type={factor.type}
                             name={factor.key}
@@ -314,11 +314,11 @@ export default function SurveyForm({
                                 handleCheckboxFactorChange(factor.key, label, points, e.target.checked);
                               }
                             }}
-                            className="text-[#176b55] focus:ring-[#176b55]"
+                            className="mt-0.5 sm:mt-0 text-[#176b55] focus:ring-[#176b55] shrink-0"
                           />
-                          <span>{label}</span>
+                          <span className="leading-tight break-words">{label}</span>
                         </div>
-                        <span className="text-[11px] font-bold opacity-75 bg-[#dce6e2] px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] sm:text-[11px] font-bold opacity-80 bg-[#dce6e2] text-[#18302a] px-2 py-0.5 rounded-full shrink-0 ml-1">
                           +{points}
                         </span>
                       </label>
@@ -332,9 +332,9 @@ export default function SurveyForm({
 
         {/* Dynamic Score Box */}
         {isScoreReady && (
-          <div className={`p-5 rounded-xl border ${riskCategory.className} transition-all duration-300`}>
-            <div className="text-xs font-bold uppercase tracking-wider text-[#6b7a76]">Puntuación acumulada</div>
-            <div className="text-4xl font-black mt-1 leading-tight">{totalScore} pts</div>
+          <div className={`p-4 sm:p-5 rounded-xl border ${riskCategory.className} transition-all duration-300`}>
+            <div className="text-xs font-bold uppercase tracking-wider opacity-80">Puntuación acumulada</div>
+            <div className="text-3xl sm:text-4xl font-black mt-1 leading-tight">{totalScore} pts</div>
             <div className="text-sm font-extrabold mt-0.5">{riskCategory.label}</div>
             <div className="text-xs mt-2 font-medium opacity-80">
               Factores respondidos: {answeredFactorsCount} / {FACTORS.length}
@@ -344,18 +344,18 @@ export default function SurveyForm({
       </div>
 
       {/* Initial Follow-up */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
         <div>
-          <h2 className="text-lg font-bold text-[#18302a]">Seguimiento inicial</h2>
+          <h2 className="text-base sm:text-lg font-bold text-[#18302a]">Seguimiento inicial</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-sm:grid-cols-1">
           <div>
             <label className="block text-xs font-bold text-[#18302a] mb-1">Interés principal</label>
             <select
               value={mainInterest}
               onChange={(e) => setMainInterest(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             >
               <option value="">Seleccionar interés principal</option>
               {TOPICS.map((t) => (
@@ -371,7 +371,7 @@ export default function SurveyForm({
             <select
               value={nextAction}
               onChange={(e) => setNextAction(e.target.value as NextActionOption)}
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             >
               <option value="Contactar">Contactar</option>
               <option value="Realizar visita">Realizar visita</option>
@@ -388,7 +388,7 @@ export default function SurveyForm({
               type="date"
               value={nextDate}
               onChange={(e) => setNextDate(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium"
             />
           </div>
 
@@ -399,22 +399,22 @@ export default function SurveyForm({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Observaciones de seguimiento..."
-              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-sm focus:outline-none focus:border-[#176b55] font-medium resize-y"
+              className="w-full px-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs sm:text-sm focus:outline-none focus:border-[#176b55] font-medium resize-y"
             />
           </div>
         </div>
       </div>
 
       {/* Consent Checkbox */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-3">
-        <label className="flex items-center gap-3 p-3 border border-[#cfdcd7] rounded-xl cursor-pointer text-xs font-bold text-[#18302a]">
+      <div className="bg-white border border-[#dce6e2] rounded-2xl p-4 sm:p-6 shadow-xs space-y-3">
+        <label className="flex items-start gap-3 p-3 border border-[#cfdcd7] rounded-xl cursor-pointer text-xs font-bold text-[#18302a]">
           <input
             type="checkbox"
             checked={consent}
             onChange={(e) => setConsent(e.target.checked)}
-            className="w-4 h-4 text-[#176b55] rounded focus:ring-[#176b55]"
+            className="w-4 h-4 text-[#176b55] rounded focus:ring-[#176b55] shrink-0 mt-0.5"
           />
-          <span>
+          <span className="leading-normal">
             La persona autoriza registrar estos datos para contacto, seguimiento y actividades de la iglesia.
           </span>
         </label>
@@ -428,10 +428,10 @@ export default function SurveyForm({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex items-center gap-3 pt-2 max-sm:flex-col">
         <button
           type="submit"
-          className="flex items-center gap-2 bg-[#176b55] hover:bg-[#0f513f] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all active:scale-[0.99]"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#176b55] hover:bg-[#0f513f] text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all active:scale-[0.99]"
         >
           <Save className="w-4 h-4" />
           <span>{editingRecord ? "Actualizar encuesta" : "Guardar encuesta"}</span>
@@ -445,7 +445,7 @@ export default function SurveyForm({
               onClear();
             }
           }}
-          className="flex items-center gap-2 bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold py-3 px-5 rounded-xl transition-colors"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold py-3 px-5 rounded-xl transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           <span>Limpiar</span>
