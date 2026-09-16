@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --p: #176b55;
+  --p2: #0f513f;
+  --soft: #edf7f3;
+  --bg: #f5f7f8;
+  --card: #ffffff;
+  --text: #18302a;
+  --muted: #6b7a76;
+  --line: #dce6e2;
+  --danger: #b42318;
+  --warn: #a15c00;
+  --shadow: 0 8px 26px rgba(20, 52, 43, 0.08);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Risk Colors */
+.risk-min { background-color: #e8f6ef; color: #176b55; border-color: #a3e0c4; }
+.risk-low { background-color: #edf8ef; color: #197a48; border-color: #b3e6c2; }
+.risk-mod { background-color: #fff8e6; color: #a15c00; border-color: #fce2a6; }
+.risk-high { background-color: #fff0e8; color: #c44e00; border-color: #fcd5c0; }
+.risk-max { background-color: #fdecea; color: #b42318; border-color: #f9beba; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f4;
+}
+::-webkit-scrollbar-thumb {
+  background: #c2d6ce;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #176b55;
+}
