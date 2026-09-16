@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Lock, X, LogIn, AlertCircle } from "lucide-react";
 import { verifyAdminPassword } from "../lib/services/survey-service";
+import { verifyAdminPasswordAction } from "../app/actions/auth";
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -17,22 +18,45 @@ export default function AdminLoginModal({
 }: AdminLoginModalProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password.trim()) {
       setError("Por favor ingrese la contraseña de administrador.");
       return;
     }
 
-    if (verifyAdminPassword(password)) {
-      setError("");
-      setPassword("");
-      onSuccess();
-    } else {
-      setError("Contraseña incorrecta. (Clave por defecto: admin123)");
+    setLoading(true);
+    try {
+      // 1. Check Server Action (verifies private ADMIN_PASSWORD on server side)
+      let isServerValid = await verifyAdminPasswordAction(password);
+
+      // 2. Check local client fallback if server action returns false (e.g. customized in localStorage)
+      if (!isServerValid) {
+        isServerValid = verifyAdminPassword(password);
+      }
+
+      if (isServerValid) {
+        setError("");
+        setPassword("");
+        onSuccess();
+      } else {
+        setError("Contraseña incorrecta.");
+      }
+    } catch (err) {
+      // Fallback to local verification if offline
+      if (verifyAdminPassword(password)) {
+        setError("");
+        setPassword("");
+        onSuccess();
+      } else {
+        setError("Contraseña incorrecta.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,7 +70,7 @@ export default function AdminLoginModal({
             </div>
             <div>
               <h2 className="text-base font-bold text-[#18302a]">Acceso Administrador</h2>
-              <p className="text-[11px] text-[#6b7a76]">Ingresa tu clave de acceso</p>
+              <p className="text-[11px] text-[#6b7a76]">Ingresa tu clave de acceso privada</p>
             </div>
           </div>
           <button
@@ -60,7 +84,7 @@ export default function AdminLoginModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-[#18302a] mb-1 uppercase tracking-wider">
-              Contraseña
+              Contraseña Privada
             </label>
             <input
               type="password"
@@ -85,10 +109,11 @@ export default function AdminLoginModal({
           <div className="flex items-center gap-2 pt-2">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-[#176b55] hover:bg-[#0f513f] text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition-all"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-[#176b55] hover:bg-[#0f513f] text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition-all disabled:opacity-50"
             >
               <LogIn className="w-4 h-4" />
-              <span>Ingresar</span>
+              <span>{loading ? "Verificando..." : "Ingresar"}</span>
             </button>
 
             <button

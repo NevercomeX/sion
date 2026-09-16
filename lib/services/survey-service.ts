@@ -10,12 +10,19 @@ const DEFAULT_ADMIN_PASS = "admin123";
 
 // Admin Authentication Helpers
 export function getAdminPassword(): string {
-  if (typeof window === "undefined") return DEFAULT_ADMIN_PASS;
-  try {
-    return localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_ADMIN_PASS;
-  } catch (err) {
-    return DEFAULT_ADMIN_PASS;
+  const envPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+  if (typeof window !== "undefined") {
+    try {
+      const custom = localStorage.getItem(ADMIN_PASS_KEY);
+      if (custom && custom.trim()) return custom.trim();
+    } catch (err) {
+      console.error("Error reading admin password from localStorage:", err);
+    }
   }
+  if (envPass && envPass.trim()) {
+    return envPass.trim();
+  }
+  return DEFAULT_ADMIN_PASS;
 }
 
 export function setAdminPassword(newPassword: string): boolean {
