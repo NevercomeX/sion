@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Roca de Sión · Conectando Vidas",
-  description: "Sistema de encuestas de salud y seguimiento congregacional IASD Roca de Sión",
+  title: "Pronostico cardiaco",
+  description: "Aplicacion para el pronostico de padecimientos cardiacos",
 };
 
 export default function RootLayout({
@@ -27,3 +27,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+// 

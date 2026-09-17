@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { getSupabaseConfig } from "../lib/supabase/client";
-import { setAdminPassword, getAdminPassword } from "../lib/services/survey-service";
+import { setAdminPassword } from "../lib/services/survey-service";
 import { createClient } from "@supabase/supabase-js";
-import { Database, CheckCircle2, AlertCircle, HardDrive, User, Key, Globe, Lock, ShieldCheck } from "lucide-react";
+import { Database, CheckCircle2, AlertCircle, HardDrive, User, Key, Globe, Lock, ShieldCheck, Users } from "lucide-react";
+import UserManagementView from "./UserManagementView";
 
 interface SettingsViewProps {
   collectors: string[];
@@ -12,6 +13,8 @@ interface SettingsViewProps {
 }
 
 export default function SettingsView({ collectors, onConfigUpdated }: SettingsViewProps) {
+  const [activeTab, setActiveTab] = useState<"users" | "security" | "supabase">("users");
+
   const [url, setUrl] = useState("");
   const [key, setKey] = useState("");
   const [msg, setMsg] = useState<{ text: string; type: "success" | "warning" | "error" } | null>(null);
@@ -108,190 +111,236 @@ export default function SettingsView({ collectors, onConfigUpdated }: SettingsVi
 
   return (
     <div className="space-y-6">
-      {/* Admin Security Settings */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[#176b55]" />
-          <h2 className="text-lg font-bold text-[#18302a]">Seguridad y Acceso Administrador</h2>
-        </div>
-        <p className="text-xs text-[#6b7a76]">
-          Cambie la clave necesaria para ingresar al panel de administración (Clave actual por defecto: <b>admin123</b>).
-        </p>
+      {/* Sub-tab Selection */}
+      <div className="flex bg-[#edf7f3] p-1.5 rounded-2xl border border-[#dce6e2] max-w-lg">
+        <button
+          onClick={() => setActiveTab("users")}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+            activeTab === "users"
+              ? "bg-white text-[#0f513f] shadow-sm font-black"
+              : "text-[#6b7a76] hover:text-[#0f513f]"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Usuarios & Links</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("security")}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+            activeTab === "security"
+              ? "bg-white text-[#0f513f] shadow-sm font-black"
+              : "text-[#6b7a76] hover:text-[#0f513f]"
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span>Seguridad Admin</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("supabase")}
+          className={`flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+            activeTab === "supabase"
+              ? "bg-white text-[#0f513f] shadow-sm font-black"
+              : "text-[#6b7a76] hover:text-[#0f513f]"
+          }`}
+        >
+          <Database className="w-4 h-4" />
+          <span>Supabase Cloud</span>
+        </button>
+      </div>
 
-        <form onSubmit={handleChangeAdminPassword} className="space-y-3">
-          <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-            <div>
-              <label className="block text-xs font-bold text-[#18302a] mb-1">Nueva Contraseña</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
-                <input
-                  type="password"
-                  value={newPass}
-                  onChange={(e) => setNewPass(e.target.value)}
-                  placeholder="Nueva clave admin"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
-                />
+      {/* Tab 1: User Management & Invite Links */}
+      {activeTab === "users" && <UserManagementView />}
+
+      {/* Tab 2: Admin Password & Local Security */}
+      {activeTab === "security" && (
+        <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-[#176b55]" />
+            <h2 className="text-lg font-bold text-[#18302a]">Seguridad y Acceso Administrador</h2>
+          </div>
+          <p className="text-xs text-[#6b7a76]">
+            Cambie la clave necesaria para ingresar al panel de administración (Clave actual por defecto: <b>admin123</b>).
+          </p>
+
+          <form onSubmit={handleChangeAdminPassword} className="space-y-3">
+            <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+              <div>
+                <label className="block text-xs font-bold text-[#18302a] mb-1">Nueva Contraseña</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
+                  <input
+                    type="password"
+                    value={newPass}
+                    onChange={(e) => setNewPass(e.target.value)}
+                    placeholder="Nueva clave admin"
+                    className="w-full pl-9 pr-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#18302a] mb-1">Confirmar Contraseña</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
+                  <input
+                    type="password"
+                    value={confirmPass}
+                    onChange={(e) => setConfirmPass(e.target.value)}
+                    placeholder="Repetir nueva clave"
+                    className="w-full pl-9 pr-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#18302a] mb-1">Confirmar Contraseña</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
-                <input
-                  type="password"
-                  value={confirmPass}
-                  onChange={(e) => setConfirmPass(e.target.value)}
-                  placeholder="Repetir nueva clave"
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
-                />
-              </div>
-            </div>
-          </div>
-
-          {passMsg && (
-            <div
-              className={`p-3 rounded-xl border text-xs flex items-center gap-2 font-medium ${
-                passMsg.type === "success"
-                  ? "bg-[#e8f6ef] border-[#a3e0c4] text-[#176b55]"
-                  : "bg-[#fdecea] border-[#f9beba] text-[#b42318]"
-              }`}
-            >
-              {passMsg.type === "success" ? (
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-              ) : (
-                <AlertCircle className="w-4 h-4 shrink-0" />
-              )}
-              <span>{passMsg.text}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="bg-[#176b55] hover:bg-[#0f513f] text-white font-bold text-xs py-2.5 px-5 rounded-xl transition-all shadow-xs"
-          >
-            Actualizar Clave Admin
-          </button>
-        </form>
-      </div>
-
-      {/* Supabase Config Card */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2">
-          <Database className="w-5 h-5 text-[#176b55]" />
-          <h2 className="text-lg font-bold text-[#18302a]">Configuración de la base central (Supabase)</h2>
-        </div>
-        <p className="text-xs text-[#6b7a76]">
-          La aplicación funciona en modo local por defecto. Para sincronizar con una base de datos central en la nube, introduzca las credenciales de su proyecto de Supabase.
-        </p>
-
-        <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
-          <div>
-            <label className="block text-xs font-bold text-[#18302a] mb-1">
-              URL del proyecto Supabase
-            </label>
-            <div className="relative">
-              <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
-              <input
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://xxxxx.supabase.co"
-                className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-[#18302a] mb-1">
-              Clave pública (anon key)
-            </label>
-            <div className="relative">
-              <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
-              <input
-                type="password"
-                value={key}
-                onChange={(e) => setKey(e.target.value)}
-                placeholder="eyJhbGciOiJIUzI1NiIsIn..."
-                className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Status Message */}
-        {msg && (
-          <div
-            className={`p-3 rounded-xl border text-xs flex items-center gap-2 font-medium ${
-              msg.type === "success"
-                ? "bg-[#e8f6ef] border-[#a3e0c4] text-[#176b55]"
-                : msg.type === "warning"
-                ? "bg-[#fff5db] border-[#f0d59a] text-[#8a5200]"
-                : "bg-[#fdecea] border-[#f9beba] text-[#b42318]"
-            }`}
-          >
-            {msg.type === "success" ? (
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-            ) : (
-              <AlertCircle className="w-4 h-4 shrink-0" />
-            )}
-            <span>{msg.text}</span>
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 flex-wrap pt-2">
-          <button
-            onClick={handleSaveConfig}
-            className="bg-[#176b55] hover:bg-[#0f513f] text-white font-bold text-xs py-2.5 px-5 rounded-xl transition-all shadow-xs"
-          >
-            Guardar configuración
-          </button>
-
-          <button
-            onClick={handleTestConnection}
-            className="bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold text-xs py-2.5 px-4 rounded-xl transition-colors"
-          >
-            Probar conexión
-          </button>
-
-          <button
-            onClick={handleLocalMode}
-            className="inline-flex items-center gap-1.5 bg-[#fdecea] hover:bg-[#f9beba] text-[#b42318] font-semibold text-xs py-2.5 px-4 rounded-xl transition-colors"
-          >
-            <HardDrive className="w-3.5 h-3.5" />
-            <span>Usar modo local</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Collectors List */}
-      <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
-        <div className="flex items-center gap-2">
-          <User className="w-5 h-5 text-[#176b55]" />
-          <h2 className="text-lg font-bold text-[#18302a]">Catálogo de encuestadores registrados</h2>
-        </div>
-        <p className="text-xs text-[#6b7a76]">
-          Los nombres de encuestadores se registran automáticamente al guardar formularios.
-        </p>
-
-        {collectors.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {collectors.map((c) => (
-              <span
-                key={c}
-                className="px-3 py-1 bg-[#edf3f1] text-[#0f513f] text-xs font-bold rounded-full border border-[#cfe5dd]"
+            {passMsg && (
+              <div
+                className={`p-3 rounded-xl border text-xs flex items-center gap-2 font-medium ${
+                  passMsg.type === "success"
+                    ? "bg-[#e8f6ef] border-[#a3e0c4] text-[#176b55]"
+                    : "bg-[#fdecea] border-[#f9beba] text-[#b42318]"
+                }`}
               >
-                {c}
-              </span>
-            ))}
+                {passMsg.type === "success" ? (
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                )}
+                <span>{passMsg.text}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="bg-[#176b55] hover:bg-[#0f513f] text-white font-bold text-xs py-2.5 px-5 rounded-xl transition-all shadow-xs"
+            >
+              Actualizar Clave Admin
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Tab 3: Supabase Cloud Config */}
+      {activeTab === "supabase" && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center gap-2">
+              <Database className="w-5 h-5 text-[#176b55]" />
+              <h2 className="text-lg font-bold text-[#18302a]">Configuración de la base central (Supabase)</h2>
+            </div>
+            <p className="text-xs text-[#6b7a76]">
+              La aplicación funciona en modo local por defecto. Para sincronizar con una base de datos central en la nube, introduzca las credenciales de su proyecto de Supabase.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+              <div>
+                <label className="block text-xs font-bold text-[#18302a] mb-1">
+                  URL del proyecto Supabase
+                </label>
+                <div className="relative">
+                  <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://xxxxx.supabase.co"
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#18302a] mb-1">
+                  Clave pública (anon key)
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7a76]" />
+                  <input
+                    type="password"
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                    placeholder="eyJhbGciOiJIUzI1NiIsIn..."
+                    className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#cfdcd7] rounded-xl text-xs font-medium focus:outline-none focus:border-[#176b55]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Status Message */}
+            {msg && (
+              <div
+                className={`p-3 rounded-xl border text-xs flex items-center gap-2 font-medium ${
+                  msg.type === "success"
+                    ? "bg-[#e8f6ef] border-[#a3e0c4] text-[#176b55]"
+                    : msg.type === "warning"
+                    ? "bg-[#fff5db] border-[#f0d59a] text-[#8a5200]"
+                    : "bg-[#fdecea] border-[#f9beba] text-[#b42318]"
+                }`}
+              >
+                {msg.type === "success" ? (
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                )}
+                <span>{msg.text}</span>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 flex-wrap pt-2">
+              <button
+                onClick={handleSaveConfig}
+                className="bg-[#176b55] hover:bg-[#0f513f] text-white font-bold text-xs py-2.5 px-5 rounded-xl transition-all shadow-xs"
+              >
+                Guardar configuración
+              </button>
+
+              <button
+                onClick={handleTestConnection}
+                className="bg-[#edf7f3] hover:bg-[#dce6e2] text-[#0f513f] font-semibold text-xs py-2.5 px-4 rounded-xl transition-colors"
+              >
+                Probar conexión
+              </button>
+
+              <button
+                onClick={handleLocalMode}
+                className="inline-flex items-center gap-1.5 bg-[#fdecea] hover:bg-[#f9beba] text-[#b42318] font-semibold text-xs py-2.5 px-4 rounded-xl transition-colors"
+              >
+                <HardDrive className="w-3.5 h-3.5" />
+                <span>Usar modo local</span>
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="text-xs text-[#6b7a76] italic">
-            Los nombres usados como encuestadores aparecerán aquí al guardar registros.
+
+          {/* Collectors List */}
+          <div className="bg-white border border-[#dce6e2] rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-[#176b55]" />
+              <h2 className="text-lg font-bold text-[#18302a]">Catálogo de encuestadores registrados</h2>
+            </div>
+            <p className="text-xs text-[#6b7a76]">
+              Los nombres de encuestadores se registran automáticamente al guardar formularios.
+            </p>
+
+            {collectors.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {collectors.map((c) => (
+                  <span
+                    key={c}
+                    className="px-3 py-1 bg-[#edf3f1] text-[#0f513f] text-xs font-bold rounded-full border border-[#cfe5dd]"
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-[#6b7a76] italic">
+                Los nombres usados como encuestadores aparecerán aquí al guardar registros.
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,7 +10,30 @@ export type NextActionOption =
 
 export type SurveyStatus = "pendiente" | "completado";
 
-export type UserRole = "public" | "admin";
+export type UserRole = "public" | "admin" | "leader" | "member" | "collector";
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: UserRole;
+  status: "active" | "inactive";
+  assignedGroup?: string;
+  avatarColor?: string;
+  createdAt: string;
+  lastLogin?: string;
+}
+
+export interface InviteToken {
+  code: string;
+  role: UserRole;
+  assignedGroup?: string;
+  createdByName?: string;
+  createdAt: string;
+  active: boolean;
+  usedCount: number;
+}
 
 export interface FactorAnswerOption {
   label: string;
@@ -72,3 +95,27 @@ export interface SupabaseConfig {
   url: string;
   key: string;
 }
+
+export type ActivityStatus = "programada" | "en_curso" | "completada" | "cancelada";
+
+export interface ActivityItem {
+  id: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  time?: string;
+  location?: string;
+  category?: string;
+  description?: string;
+  organizer?: string;
+  status: ActivityStatus;
+  
+  // Extensible Placeholders for future expansion
+  placeholderField1?: string;
+  placeholderField2?: string;
+  placeholderField3?: string;
+  placeholderExtraData?: Record<string, any>;
+
+  createdAt: string;
+  updatedAt: string;
+}
+

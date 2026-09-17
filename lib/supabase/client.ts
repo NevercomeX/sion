@@ -52,3 +52,28 @@ export function getSupabaseClient(): SupabaseClient | null {
     return null;
   }
 }
+
+export async function checkSupabaseHealth(): Promise<"connected" | "error" | "local"> {
+  const config = getSupabaseConfig();
+  if (!config) return "local";
+
+  const supabase = getSupabaseClient();
+  if (!supabase) return "error";
+
+  try {
+    const { error } = await supabase
+      .from("surveys")
+      .select("id", { count: "exact", head: true });
+
+    if (error) {
+      console.warn("Supabase health check returned error:", error.message);
+      return "error";
+    }
+
+    return "connected";
+  } catch (err) {
+    console.error("Supabase health check exception:", err);
+    return "error";
+  }
+}
+

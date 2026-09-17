@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SurveyRecord, UserRole } from "../lib/types";
+import { SurveyRecord, UserProfile } from "../lib/types";
 import {
   fetchSurveys,
   saveSurveyRecord,
   deleteSurveyRecord,
   fetchCollectors,
-  isAdminLoggedIn,
-  setAdminSession,
 } from "../lib/services/survey-service";
-import { getSupabaseConfig } from "../lib/supabase/client";
+import { getLoggedInUser, logoutUser } from "../lib/services/auth-service";
+import { getSupabaseConfig, checkSupabaseHealth } from "../lib/supabase/client";
 
 import PublicSurveyView from "../components/PublicSurveyView";
+import LoginScreen from "../components/LoginScreen";
+import UserProfileModal from "../components/UserProfileModal";
 import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Header, { SupabaseStatus } from "../components/Header";
 import HomeDashboard from "../components/HomeDashboard";
 import SurveyForm from "../components/SurveyForm";
 import ContactsTable from "../components/ContactsTable";
@@ -22,31 +23,65 @@ import FollowUpPanel from "../components/FollowUpPanel";
 import ReportsView from "../components/ReportsView";
 import SettingsView from "../components/SettingsView";
 import BackupView from "../components/BackupView";
+import ActivitiesView from "../components/ActivitiesView";
 import DetailModal from "../components/DetailModal";
 
 export default function Home() {
-  const [role, setRole] = useState<UserRole>("public");
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<string>("home");
   const [records, setRecords] = useState<SurveyRecord[]>([]);
   const [collectors, setCollectors] = useState<string[]>([]);
+
+  // Supabase Connection & Health State
   const [isSupabaseActive, setIsSupabaseActive] = useState<boolean>(false);
+  const [supabaseStatus, setSupabaseStatus] = useState<SupabaseStatus>("checking");
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
 
   const [editingRecord, setEditingRecord] = useState<SurveyRecord | null>(null);
   const [detailModalId, setDetailModalId] = useState<string | null>(null);
 
-  // Check login & Supabase config on mount
+  // Invite code query parameter state (e.g. ?invite=RS_INVITE_2026)
+  const [inviteCodeFromUrl, setInviteCodeFromUrl] = useState<string>("");
+
   useEffect(() => {
-    if (isAdminLoggedIn()) {
-      setRole("admin");
+    // 1. Check URL query string for authorized invite links
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const inviteParam = params.get("invite");
+      if (inviteParam) {
+        setInviteCodeFromUrl(inviteParam.trim().toUpperCase());
+      }
     }
+
+    // 2. Check logged-in user session
+    const active = getLoggedInUser();
+    if (active) {
+      setCurrentUser(active);
+    }
+
     checkSupabaseConfig();
     loadData();
   }, []);
 
-  const checkSupabaseConfig = () => {
+  const checkSupabaseConfig = async () => {
     const cfg = getSupabaseConfig();
-    setIsSupabaseActive(Boolean(cfg));
+    if (!cfg) {
+      setIsSupabaseActive(false);
+      setSupabaseStatus("local");
+      return;
+    }
+
+    setIsSupabaseActive(true);
+    setSupabaseStatus("checking");
+
+    try {
+      const health = await checkSupabaseHealth();
+      setSupabaseStatus(health);
+    } catch (err) {
+      setSupabaseStatus("error");
+    }
   };
 
   const loadData = async () => {
@@ -56,16 +91,15 @@ export default function Home() {
     setCollectors(cols);
   };
 
-  const handleAdminLoginSuccess = () => {
-    setAdminSession(true);
-    setRole("admin");
+  const handleLoginSuccess = (user: UserProfile) => {
+    setCurrentUser(user);
     setActiveTab("home");
     loadData();
   };
 
-  const handleAdminLogout = () => {
-    setAdminSession(false);
-    setRole("public");
+  const handleLogout = () => {
+    logoutUser();
+    setCurrentUser(null);
     setEditingRecord(null);
   };
 
@@ -79,7 +113,7 @@ export default function Home() {
   const handleSaveSurvey = async (record: SurveyRecord) => {
     await saveSurveyRecord(record);
     await loadData();
-    if (role === "admin") {
+    if (currentUser) {
       setEditingRecord(null);
       setActiveTab("contacts");
     }
@@ -177,31 +211,37 @@ export default function Home() {
     follow: "Seguimiento",
     reports: "Reportes",
     backup: "Copias / datos",
-    settings: "Configuración",
+    settings: "Configuración y Usuarios",
+    person: "Personas",
+    "follow-up": "Seguimiento",
+    register: "Registro",
+    Activities: "Calendario de Actividades",
   };
 
-  // 1. PUBLIC USER VIEW: Shared link view for regular respondents
-  if (role === "public") {
+  // 1. UNAUTHENTICATED / LOGIN VIEW: Show LoginPortal with quick login & invite link registration
+  if (!currentUser) {
     return (
-      <PublicSurveyView
-        onSaveSurvey={handleSaveSurvey}
-        onAdminLoginSuccess={handleAdminLoginSuccess}
+      <LoginScreen
+        onLoginSuccess={handleLoginSuccess}
+        initialInviteCode={inviteCodeFromUrl}
       />
     );
   }
 
-  // 2. ADMIN VIEW: Full Control Panel
+  // 2. AUTHENTICATED USER CONTROL PANEL
   const selectedRecord = records.find((r) => r.id === detailModalId) || null;
 
   return (
     <div className="flex min-h-screen bg-[#f5f7f8]">
-      {/* Sidebar */}
+      {/* Sidebar Navigation */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onNewSurvey={handleNewSurveyTrigger}
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        userProfile={currentUser}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -209,9 +249,12 @@ export default function Home() {
         <Header
           title={titleMap[activeTab] || "Roca de Sión"}
           isSupabaseActive={isSupabaseActive}
-          userName="Administrador"
+          supabaseStatus={supabaseStatus}
+          userProfile={currentUser}
+          userName={currentUser.name}
           onNewSurvey={handleNewSurveyTrigger}
-          onAdminLogout={handleAdminLogout}
+          onAdminLogout={handleLogout}
+          onOpenProfile={() => setIsProfileModalOpen(true)}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
@@ -225,14 +268,14 @@ export default function Home() {
 
           {activeTab === "survey" && (
             <SurveyForm
-              currentCollector="Administrador"
+              currentCollector={currentUser.name}
               editingRecord={editingRecord}
               onSave={handleSaveSurvey}
               onClear={() => setEditingRecord(null)}
             />
           )}
 
-          {activeTab === "contacts" && (
+          {(activeTab === "contacts" || activeTab === "person" || activeTab === "register") && (
             <ContactsTable
               records={records}
               onOpenDetail={(id) => setDetailModalId(id)}
@@ -240,12 +283,14 @@ export default function Home() {
             />
           )}
 
-          {activeTab === "follow" && (
+          {(activeTab === "follow" || activeTab === "follow-up") && (
             <FollowUpPanel
               records={records}
               onOpenDetail={(id) => setDetailModalId(id)}
             />
           )}
+
+          {activeTab === "Activities" && <ActivitiesView />}
 
           {activeTab === "reports" && <ReportsView records={records} />}
 
@@ -269,6 +314,16 @@ export default function Home() {
           )}
         </main>
       </div>
+
+      {/* User Profile Modal */}
+      {isProfileModalOpen && currentUser && (
+        <UserProfileModal
+          user={currentUser}
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          onProfileUpdated={(updated) => setCurrentUser(updated)}
+        />
+      )}
 
       {/* Detail Modal */}
       {detailModalId && (
